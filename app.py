@@ -1,21 +1,21 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from flask_cors import CORS
+  
+from flask_pymongo import PyMongo
+from bson import ObjectId
 
+# Instantiation
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "*"}})
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
-db = SQLAlchemy(app)
+app.config['MONGO_URI'] = 'mongodb://localhost/pythonreact'
+mongo = PyMongo(app)
 
-class Todo(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    content = db.Column(db.String(200), nullable=False)
-    completed = db.Column(db.Integer, default=0)
-    date_created = db.Column(db.DateTime, default=datetime.utcnow)
+# Settings
+CORS(app)
 
-    def __repr__(self):
-        return '<Task %r>' % self.id
+# Database
+db = mongo.db.pythonreact
 
 
 @app.route('/')
@@ -31,6 +31,29 @@ def createUser():
     'password': request.json['password']
   })
   return jsonify(str(ObjectId(id)))
+
+@app.route('/users', methods=['GET'])
+def getUsers():
+    users = []
+    for doc in db.find():
+        users.append({
+            '_id': str(ObjectId(doc['_id'])),
+            'name': doc['name'],
+            'email': doc['email'],
+            'password': doc['password']
+        })
+    return jsonify(users)
+
+@app.route('/users/<id>', methods=['GET'])
+def getUser(id):
+  user = db.find_one({'_id': ObjectId(id)})
+  print(user)
+  return jsonify({
+      '_id': str(ObjectId(user['_id'])),
+      'name': user['name'],
+      'email': user['email'],
+      'password': user['password']
+  })
 
 if __name__ == "__main__":
     app.run(debug=True)

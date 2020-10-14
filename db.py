@@ -1,7 +1,6 @@
 from flask_pymongo import PyMongo
 from pymongo import MongoClient
 
-
 import os
 from os.path import join, dirname
 from dotenv import load_dotenv

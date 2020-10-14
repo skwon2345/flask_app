@@ -3,7 +3,22 @@ from datetime import datetime
 from flask_cors import CORS
 
 from bson import ObjectId
-import db
+
+from flask_pymongo import PyMongo
+from pymongo import MongoClient
+
+import os
+from os.path import join, dirname
+from dotenv import load_dotenv
+
+dotenv_path = join(dirname(__file__), '.env')
+load_dotenv(dotenv_path)
+
+db_url = os.environ.get("DB_URL")
+
+client = MongoClient(db_url)
+
+db = client.test_db
 
 # Instantiation
 app = Flask(__name__)
@@ -19,7 +34,7 @@ def index():
 def createUser():
   print(request.json)
 
-  post = db.db.post.insert_one({
+  post = db.post.insert_one({
     'name': request.json['name'],
     'email': request.json['email'],
     'password': request.json['password']
@@ -36,7 +51,7 @@ def createUser():
 @app.route('/users', methods=['GET'])
 def getUsers():
   users = []
-  for doc in db.db.post.find():
+  for doc in db.post.find():
       users.append({
           '_id': str(ObjectId(doc['_id'])),
           'name': doc['name'],

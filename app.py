@@ -2,21 +2,15 @@ from flask import Flask, render_template, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from flask_cors import CORS
-  
-from flask_pymongo import PyMongo
+
 from bson import ObjectId
+import db
 
 # Instantiation
 app = Flask(__name__)
-app.config['MONGO_URI'] = 'mongodb://localhost/pythonreact'
-mongo = PyMongo(app)
 
 # Settings
 CORS(app)
-
-# Database
-db = mongo.db.pythonreact
-
 
 @app.route('/')
 def index():
@@ -26,37 +20,30 @@ def index():
 def createUser():
   print(request.json)
 
-  ret = {
+  post = db.db.post.insert_one({
     'name': request.json['name'],
     'email': request.json['email'],
     'password': request.json['password']
-  }
+  })
 
-  # id = db.insert({
-  #   'name': request.json['name'],
-  #   'email': request.json['email'],
-  #   'password': request.json['password']
-  # })
+  _id = post.inserted_id
 
-  # return jsonify(str(ObjectId(id)))
-  return jsonify(ret)
+  print("++++")
+  print(jsonify(str(ObjectId(_id))))
+  print("++++")
+
+  return jsonify(str(ObjectId(_id)))
 
 @app.route('/users', methods=['GET'])
 def getUsers():
-  users = {
-    'name': 'dfe',
-    'email': 'sjfe@naver.com',
-    'password': 'feafs'
-  }
-  # users = []
-  # for doc in db.find():
-
-  #     users.append({
-  #         '_id': str(ObjectId(doc['_id'])),
-  #         'name': doc['name'],
-  #         'email': doc['email'],
-  #         'password': doc['password']
-  #     })
+  users = []
+  for doc in db.db.post.find():
+      users.append({
+          '_id': str(ObjectId(doc['_id'])),
+          'name': doc['name'],
+          'email': doc['email'],
+          'password': doc['password']
+      })
   return jsonify(users)
 
 @app.route('/users/<id>', methods=['GET'])

@@ -10,6 +10,6 @@ load_dotenv(dotenv_path)
 
 db_url = os.environ.get("DB_URL")
 
-client = MongoClient(db_url)
+client = MongoClient(db_url,connectTimeoutMS=30000, socketTimeoutMS=None, socketKeepAlive=True, connect=False, maxPoolsize=1)
 
 db = client.test_db

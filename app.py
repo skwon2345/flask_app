@@ -22,7 +22,8 @@ def createUser():
 
   post  = {
     'name':'fe',
-    'password':'ge'
+    'password':'ge',
+    'email': 'fe@g.com'
   }
   return jsoinfy(post)
 

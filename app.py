@@ -1,16 +1,21 @@
 from flask import Flask, render_template, jsonify, request
 from datetime import datetime
 from flask_cors import CORS
+from pymongo import MongoClient
 
 from bson import ObjectId
-
-import db
 
 # Instantiation
 app = Flask(__name__)
 
 # Settings
 CORS(app)
+
+db_url = 'mongodb+srv://1234:1234@cluster0.9ywfp.mongodb.net/test_db?retryWrites=true&w=majority'
+
+client = MongoClient(db_url)
+
+db = client.test_db
 
 @app.route('/')
 def index():
@@ -20,7 +25,7 @@ def index():
 def createUser():
   print(request.json)
 
-  post = db.db.post.insert_one({
+  post = db.post.insert_one({
     'name': request.json['name'],
     'email': request.json['email'],
     'password': request.json['password']
@@ -32,7 +37,7 @@ def createUser():
 @app.route('/users', methods=['GET'])
 def getUsers():
   users = []
-  for doc in db.db.post.find():
+  for doc in db.post.find():
       users.append({
           '_id': str(ObjectId(doc['_id'])),
           'name': doc['name'],
@@ -44,7 +49,7 @@ def getUsers():
 
 @app.route('/users/<id>', methods=['GET'])
 def getUser(id):
-  user = db.db.find_one({'_id': ObjectId(id)})
+  user = db.find_one({'_id': ObjectId(id)})
   print(user)
   return jsonify({
       '_id': str(ObjectId(user['_id'])),

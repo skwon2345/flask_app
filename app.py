@@ -3,6 +3,7 @@ from datetime import datetime
 from flask_cors import CORS
 
 from bson import ObjectId
+
 import db
 
 # Instantiation
@@ -27,27 +28,29 @@ def createUser():
 
   _id = post.inserted_id
 
-  print("++++")
-  print(jsonify(str(ObjectId(_id))))
-  print("++++")
-
   return jsonify(str(ObjectId(_id)))
 
 @app.route('/users', methods=['GET'])
 def getUsers():
   users = []
-  for doc in db.db.post.find():
-      users.append({
-          '_id': str(ObjectId(doc['_id'])),
-          'name': doc['name'],
-          'email': doc['email'],
-          'password': doc['password']
-      })
+  users.append({
+    'name': 'fe',
+    'password': 'fesfe'
+  })
+
   return jsonify(users)
+  # for doc in db.db.post.find():
+  #     users.append({
+  #         '_id': str(ObjectId(doc['_id'])),
+  #         'name': doc['name'],
+  #         'email': doc['email'],
+  #         'password': doc['password']
+  #     })
+  # return jsonify(users)
 
 @app.route('/users/<id>', methods=['GET'])
 def getUser(id):
-  user = db.find_one({'_id': ObjectId(id)})
+  user = db.db.find_one({'_id': ObjectId(id)})
   print(user)
   return jsonify({
       '_id': str(ObjectId(user['_id'])),

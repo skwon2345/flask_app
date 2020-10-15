@@ -21,38 +21,27 @@ def index():
 def createUser():
   print(request.json)
 
-  post = {
-    'name':'ege'
-  }
+  post = db.db.post.insert_one({
+    'name': request.json['name'],
+    'email': request.json['email'],
+    'password': request.json['password']
+  })
+  _id = post.inserted_id
 
-  return jsonify(post)
-
-  # post = db.db.post.insert_one({
-  #   'name': request.json['name'],
-  #   'email': request.json['email'],
-  #   'password': request.json['password']
-  # })
-  # _id = post.inserted_id
-
-  # return jsonify(str(ObjectId(_id)))
+  return jsonify(str(ObjectId(_id)))
 
 @app.route('/users', methods=['GET'])
 def getUsers():
   users = []
-  users.append({
-    'name':'fes'
-  })
-
-  return jsonify(users)
-  # for doc in db.db.post.find():
-  #     users.append({
-  #         '_id': str(ObjectId(doc['_id'])),
-  #         'name': doc['name'],
-  #         'email': doc['email'],
-  #         'password': doc['password']
-  #     })
+  for doc in db.db.post.find():
+      users.append({
+          '_id': str(ObjectId(doc['_id'])),
+          'name': doc['name'],
+          'email': doc['email'],
+          'password': doc['password']
+      })
       
-  # return jsonify(users)
+  return jsonify(users)
 
 @app.route('/users/<id>', methods=['GET'])
 def getUser(id):
